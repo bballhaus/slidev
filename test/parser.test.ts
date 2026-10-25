@@ -625,6 +625,14 @@ Some content
     ])
   })
 
+  it('imports every slide without an error when a src: range is empty', async () => {
+    const root = resolve(__dirname, 'fixtures/markdown/empty-range')
+    const data = await load({ userRoot: root, roots: [root] }, resolve(root, 'entry.md'))
+    const errors = Object.values(data.markdownFiles).flatMap(md => md.errors ?? [])
+    expect(errors).toEqual([])
+    expect(data.slides.map(s => s.title)).toEqual(['Entry', 'One', 'Two'])
+  })
+
   it('records an error when a src: import escapes the allowed roots', async () => {
     const root = resolve(__dirname, 'fixtures/markdown/escaping/root')
     const data = await load({ userRoot: root, roots: [root], allowedRoots: [root] }, resolve(root, 'entry.md'))

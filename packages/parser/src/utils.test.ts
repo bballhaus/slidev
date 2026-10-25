@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { isPathInsideRoots } from './fs'
+import { parseRangeString } from './utils'
+
+describe('parseRangeString', () => {
+  it('drops slide numbers below 1', () => {
+    expect(parseRangeString(5, '0')).toEqual([])
+    expect(parseRangeString(5, '-3')).toEqual([1, 2, 3])
+    expect(parseRangeString(5, '0,2')).toEqual([2])
+  })
+
+  it('drops slide numbers above the total', () => {
+    expect(parseRangeString(5, '4-8')).toEqual([4, 5])
+  })
+})
 
 describe('isPathInsideRoots', () => {
   it('accepts a path nested inside a root', () => {

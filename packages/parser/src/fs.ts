@@ -29,6 +29,7 @@ const RE_FRONTMATTER_START = /^---(?:[^-].*)?$/
 const RE_BLANK_LINE = /^\s*$/
 const RE_FRONTMATTER_END = /^---$/
 const RE_CRLF = /\r?\n/g
+const RE_RANGE_SEPARATOR = /[,;]/g
 
 export * from './core'
 
@@ -95,12 +96,22 @@ export async function load(
       watchFiles[path] = new Set()
     }
 
+    // `parseRangeString` drops slide numbers below 1, so report them here
+    for (const part of range ? range.split(RE_RANGE_SEPARATOR) : []) {
+      const start = +part.split('-', 2)[0]
+      if (start < 1) {
+        md.errors ??= []
+        md.errors.push({
+          row: 0,
+          message: `Slide ${start} does not exist in "${path}", which has ${md.slides.length} slides`,
+        })
+      }
+    }
+
     const directImporter = importers?.at(-1)
     for (const index of parseRangeString(md.slides.length, range)) {
       const subSlide = md.slides[index - 1]
       if (!subSlide) {
-        // `parseRangeString` only drops indexes above the total, so a range
-        // such as `#0` or `#-3` still reaches here and has no slide.
         md.errors ??= []
         md.errors.push({
           row: 0,

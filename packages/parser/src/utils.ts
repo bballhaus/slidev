@@ -27,7 +27,7 @@ export function parseRangeString(total: number, rangeStr?: string) {
     }
   }
 
-  return uniq(indexes).filter(i => i <= total).sort((a, b) => a - b)
+  return uniq(indexes).filter(i => i >= 1 && i <= total).sort((a, b) => a - b)
 }
 
 /**
